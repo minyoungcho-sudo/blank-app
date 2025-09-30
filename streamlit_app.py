@@ -1,86 +1,92 @@
+
 import streamlit as st
-
-st.title("Streamlit 주요 UI 요소 예시")  # 페이지 제목
-
-# 1. 텍스트 출력
-st.header("1. 텍스트 출력")  # 각주: 제목, 헤더, 일반 텍스트 등 다양한 텍스트 출력 가능
-st.write("이것은 일반 텍스트입니다.")
-st.markdown("**마크다운** _스타일_도 지원합니다.")
-st.code("print('Hello, Streamlit!')", language='python')
-
-# 2. 입력 위젯
-st.header("2. 입력 위젯")  # 각주: 사용자로부터 값을 입력받는 다양한 위젯
-name = st.text_input("이름을 입력하세요")  # 텍스트 입력
-age = st.number_input("나이를 입력하세요", min_value=0, max_value=120)  # 숫자 입력
-bio = st.text_area("자기소개를 입력하세요")  # 여러 줄 텍스트 입력
-password = st.text_input("비밀번호", type="password")  # 비밀번호 입력
-date = st.date_input("날짜를 선택하세요")  # 날짜 선택
-time = st.time_input("시간을 선택하세요")  # 시간 선택
-
-# 3. 선택 위젯
-st.header("3. 선택 위젯")  # 각주: 여러 옵션 중 하나 또는 여러 개 선택
-color = st.selectbox("좋아하는 색을 선택하세요", ["빨강", "파랑", "초록"])  # 단일 선택
-hobbies = st.multiselect("취미를 선택하세요", ["독서", "운동", "게임", "음악"])  # 다중 선택
-agree = st.checkbox("동의합니다")  # 체크박스
-gender = st.radio("성별을 선택하세요", ["남성", "여성", "기타"])  # 라디오 버튼
-option = st.toggle("옵션 활성화")  # 토글 스위치
-
-# 4. 슬라이더
-st.header("4. 슬라이더")  # 각주: 범위 내에서 값 선택
-level = st.slider("난이도", 1, 10, 5)  # 숫자 슬라이더
-range_val = st.slider("범위 선택", 0, 100, (25, 75))  # 범위 슬라이더
-
-# 5. 파일 업로드
-st.header("5. 파일 업로드")  # 각주: 파일을 업로드하여 처리 가능
-uploaded_file = st.file_uploader("파일을 업로드하세요", type=["csv", "xlsx", "png", "jpg"])
-
-# 6. 버튼
-st.header("6. 버튼")  # 각주: 클릭 이벤트 처리
-if st.button("클릭하세요"):
-    st.write("버튼이 클릭되었습니다!")
-
-# 7. 이미지, 오디오, 비디오
-st.header("7. 미디어 출력")  # 각주: 이미지, 오디오, 비디오 등 다양한 미디어 출력
-st.image("https://static.streamlit.io/examples/dog.jpg", caption="강아지 이미지")
-st.audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3")
-st.video("https://www.w3schools.com/html/mov_bbb.mp4")
-
-# 8. 데이터프레임/테이블
-st.header("8. 데이터 출력")  # 각주: 표 형태의 데이터 출력
 import pandas as pd
-df = pd.DataFrame({
-    "이름": ["홍길동", "김철수", "이영희"],
-    "나이": [25, 32, 29]
-})
-st.dataframe(df)  # 동적 테이블
-st.table(df)      # 정적 테이블
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-# 9. 상태 표시 및 알림
-st.header("9. 상태 표시 및 알림")  # 각주: 진행상황, 경고, 성공 메시지 등
-st.success("성공 메시지입니다!")
-st.info("정보 메시지입니다.")
-st.warning("경고 메시지입니다.")
-st.error("에러 메시지입니다.")
-st.progress(70)  # 진행률 표시 (0~100)
+st.title("성적 데이터 시각화 앱")
+st.caption("1. CSV 파일 업로드 → 2. 그래프 옵션 선택 → 3. 변수 선택 → 4. 맞춤형 그래프 자동 생성")
 
-# 10. 사이드바
-st.sidebar.header("사이드바 예시")  # 각주: 사이드바에 요소 배치 가능
-st.sidebar.selectbox("사이드바 선택", ["옵션1", "옵션2", "옵션3"])
+# 1. CSV 파일 업로드
+st.header("1. 성적 데이터 CSV 파일 업로드")
+uploaded_file = st.file_uploader("성적 데이터 CSV 파일을 업로드하세요", type=["csv"])
 
-# 11. 폼(Form)
-st.header("11. 폼(Form)")  # 각주: 여러 입력을 묶어서 제출
-with st.form("my_form"):
-    st.text_input("폼 내 텍스트 입력")
-    submitted = st.form_submit_button("폼 제출")
-    if submitted:
-        st.write("폼이 제출되었습니다.")
+df = None
+if uploaded_file:
+    try:
+        df = pd.read_csv(uploaded_file)
+        st.success("데이터 업로드 성공!")
+        st.dataframe(df)
+    except Exception as e:
+        st.error(f"파일을 읽는 중 오류 발생: {e}")
 
-# 12. 기타 요소
-st.header("12. 기타 요소")  # 각주: 코드, 예외, 도움말 등
-st.help(pd.DataFrame)  # 객체의 도움말 출력
-try:
-    1 / 0
-except Exception as e:
-    st.exception(e)  # 예외 출력
+# 2. 그래프 옵션 선택
+st.header("2. 시각화 옵션 선택")
+graph_types = {
+    "히스토그램": "hist",
+    "막대그래프": "bar",
+    "산점도": "scatter",
+    "상자그림": "box"
+}
 
-st.caption("모든 주요 Streamlit 요소 예시를 한 페이지에 모았습니다.")  # 각주: 짧은 설명
+selected_graph = st.radio("원하는 그래프를 선택하세요", list(graph_types.keys()))
+
+# 3. 변수 선택 및 맞춤형 그래프 그리기
+if df is not None:
+    st.header(f"3. '{selected_graph}'에 사용할 변수 선택")
+    numeric_cols = df.select_dtypes(include=['number']).columns.tolist()
+    all_cols = df.columns.tolist()
+
+    if graph_types[selected_graph] == "hist":
+        col = st.selectbox("히스토그램에 사용할 숫자형 변수 선택", numeric_cols)
+        if col:
+            fig, ax = plt.subplots()
+            ax.hist(df[col].dropna(), bins=20, color='skyblue', edgecolor='black')
+            ax.set_title(f"{col} 히스토그램")
+            ax.set_xlabel(col)
+            ax.set_ylabel("빈도")
+            st.pyplot(fig)
+            st.caption(f"선택한 변수 '{col}'의 분포를 보여줍니다.")
+
+    elif graph_types[selected_graph] == "bar":
+        col = st.selectbox("막대그래프에 사용할 범주형 변수 선택", [c for c in all_cols if df[c].dtype == 'object'])
+        if col:
+            fig, ax = plt.subplots()
+            df[col].value_counts().plot(kind='bar', ax=ax, color='orange', edgecolor='black')
+            ax.set_title(f"{col} 막대그래프")
+            ax.set_xlabel(col)
+            ax.set_ylabel("빈도")
+            st.pyplot(fig)
+            st.caption(f"선택한 변수 '{col}'의 빈도수를 막대그래프로 보여줍니다.")
+
+    elif graph_types[selected_graph] == "scatter":
+        x_col = st.selectbox("산점도의 X축 변수(숫자형) 선택", numeric_cols, key="scatter_x")
+        y_col = st.selectbox("산점도의 Y축 변수(숫자형) 선택", numeric_cols, key="scatter_y")
+        if x_col and y_col:
+            fig, ax = plt.subplots()
+            ax.scatter(df[x_col], df[y_col], alpha=0.7, color='green')
+            ax.set_title(f"{x_col} vs {y_col} 산점도")
+            ax.set_xlabel(x_col)
+            ax.set_ylabel(y_col)
+            st.pyplot(fig)
+            st.caption(f"'{x_col}'과(와) '{y_col}'의 관계를 산점도로 보여줍니다.")
+
+    elif graph_types[selected_graph] == "box":
+        col = st.selectbox("상자그림에 사용할 숫자형 변수 선택", numeric_cols)
+        group_col = st.selectbox("(선택) 그룹화할 범주형 변수", [None] + [c for c in all_cols if df[c].dtype == 'object'])
+        fig, ax = plt.subplots()
+        if group_col and group_col != None:
+            sns.boxplot(x=df[group_col], y=df[col], ax=ax)
+            ax.set_title(f"{col}의 상자그림 (그룹: {group_col})")
+            ax.set_xlabel(group_col)
+            ax.set_ylabel(col)
+            st.caption(f"'{group_col}'별 '{col}'의 분포를 상자그림으로 보여줍니다.")
+        else:
+            sns.boxplot(y=df[col], ax=ax)
+            ax.set_title(f"{col}의 상자그림")
+            ax.set_ylabel(col)
+            st.caption(f"선택한 변수 '{col}'의 분포를 상자그림으로 보여줍니다.")
+        st.pyplot(fig)
+
+else:
+    st.info("CSV 파일을 먼저 업로드하세요.")
